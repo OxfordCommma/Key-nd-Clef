@@ -16,7 +16,7 @@ class Albumes:
                 ANIO INT(10),
                 GENERO VARCHAR(50),
                 VALORACION INT(10),
-                COMENTARIO VARCHAR(50))
+                COMENTARIO VARCHAR(255))
             """)
             self.miConexion.commit()
 

@@ -62,6 +62,18 @@ class Ventana(Frame): #Frame es la clase Padre. Es decir, la instancia de Ventan
         for item in self.grid.get_children():
             self.grid.delete(item)
 
+    def controlCamposVacios(self): #Mejorar
+        listaCampos = [self.txtAlbum.get(), self.txtArtista.get(), self.txtGenero.get(), self.txtAnio.get(), self.txtValoracion.get()] 
+
+        for campo in listaCampos:
+            if campo == "":
+                return True
+            return False
+
+    def controlCampoNumero(self, numero):
+        return numero.isdecimal()
+
+
     def fNuevo(self):
 
         selected = self.grid.focus() # Al tocar el botón "Modificar", se guarda el registro seleccionado (como diccionario) en una variable
@@ -80,23 +92,31 @@ class Ventana(Frame): #Frame es la clase Padre. Es decir, la instancia de Ventan
     def fGuardar(self):
         if self.id == -1: # Si es -1, es porque se inserta un nuevo registro
 
-            r = messagebox.askquestion("Guardar", "¿Deseas guardar el registro en la base?\n")
-            if r == messagebox.YES:
-                self.albumes.inserta_album(self.txtAlbum.get(), self.txtArtista.get(), self.txtAnio.get(), self.txtGenero.get(), self.txtValoracion.get(), self.txtComentario.get()) 
-                #Al tocar el botón "Guardar", se cargan en la query que carga el método inserta_album, los datos que están en las 4 cajas
-                messagebox.showinfo("Guardar", "Elemento guardado correctamente")
+            if self.controlCamposVacios():
+                messagebox.showwarning("Guardar", "Hay datos vacios.")
+
             else:
-                pass
+                r = messagebox.askquestion("Guardar", "¿Deseas guardar el registro en la base?\n")
+                if r == messagebox.YES:
+                    self.albumes.inserta_album(self.txtAlbum.get(), self.txtArtista.get(), self.txtAnio.get(), self.txtGenero.get(), self.txtValoracion.get(), self.txtComentario.get()) 
+                    #Al tocar el botón "Guardar", se cargan en la query que carga el método inserta_album, los datos que están en las 4 cajas
+                    messagebox.showinfo("Guardar", "Elemento guardado correctamente")
+                else:
+                    pass
 
         else: # Es porque se está modificando un registro
 
-            r = messagebox.askquestion("Guardar", "¿Deseas guardar la modificación del registro?\n")
-            if r == messagebox.YES:
-                self.albumes.modifica_album(self.id, self.txtAlbum.get(), self.txtArtista.get(), int(self.txtAnio.get()), self.txtGenero.get(), int(self.txtValoracion.get()), self.txtComentario.get()) #Se guarda la modificación. el parámeto es el id del registro seleccionado luego de tocar el botón "Modificar"
-                messagebox.showinfo("Guardar", "Elemento modificado correctamente")
-                self.id = -1 #Luego de guardar una modificación, la variable id vuelve a su estado original
+            if self.controlCamposVacios():
+                messagebox.showwarning("Guardar", "Hay datos vacios.")
+
             else:
-                pass
+                r = messagebox.askquestion("Guardar", "¿Deseas guardar la modificación del registro?\n")
+                if r == messagebox.YES:
+                    self.albumes.modifica_album(self.id, self.txtAlbum.get(), self.txtArtista.get(), int(self.txtAnio.get()), self.txtGenero.get(), int(self.txtValoracion.get()), self.txtComentario.get()) #Se guarda la modificación. el parámeto es el id del registro seleccionado luego de tocar el botón "Modificar"
+                    messagebox.showinfo("Guardar", "Elemento modificado correctamente")
+                    self.id = -1 #Luego de guardar una modificación, la variable id vuelve a su estado original
+                else:
+                    pass
 
         self.limpiarTabla() #Se busca borrar la tabla desactualizada para cargarla nuevamente
         self.llenarTabla() #Se busca actualizar la tabla, una vez cargado el nuevo registro
@@ -217,7 +237,7 @@ class Ventana(Frame): #Frame es la clase Padre. Es decir, la instancia de Ventan
         #Par Etiqueta - Caja Año
         lbl3 = Label(frame2, text = "Año: ",  bg = "#303030", fg = "white")
         lbl3.place(x = 10, y = 105)
-        self.txtAnio = Entry(frame2)
+        self.txtAnio = Entry(frame2, validate="key", validatecommand=(self.register(self.controlCampoNumero), "%S"))
         self.txtAnio.place(x = 10, y = 125, width = 50, height = 20)
 
         #Par Etiqueta - Caja Genero
@@ -229,7 +249,7 @@ class Ventana(Frame): #Frame es la clase Padre. Es decir, la instancia de Ventan
         #Par Etiqueta - Caja Valoración
         lbl4 = Label(frame2, text = "Valoración: ",  bg = "#303030", fg = "white")
         lbl4.place(x = 10, y = 205)
-        self.txtValoracion = Entry(frame2)
+        self.txtValoracion = Entry(frame2, validate="key", validatecommand=(self.register(self.controlCampoNumero), "%S"))
         self.txtValoracion.place(x = 10, y = 225, width = 50, height = 20)
 
         #Par Etiqueta - Caja Comentario
